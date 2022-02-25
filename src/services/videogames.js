@@ -36,8 +36,39 @@ const getFirstTwenty = async(array) => {
     return deleteSpaces;
 }
 
+const getVideogamesById = async(id) => {
+    const videogame = await axios(`https://api.rawg.io/api/games/${id}?key=d0e09f787b57497bb836b8c8bfea4c6e`);
+    const videogameMap = await {
+        id: videogame.data.id,
+        name: videogame.data.name,
+        released: videogame.data.released,
+        image: videogame.data.background_image,
+        rating: videogame.data.rating,
+        platforms: videogame.data.platforms.map(platform => platform.platform.name),
+        genres: videogame.data.genres.map(genre => genre.name),
+        description: videogame.data.description
+    }
+    return videogameMap;
+}
+
+const getQueryDataApi = async(name) => {
+    const dataApi = await axios(`https://api.rawg.io/api/games?key=d0e09f787b57497bb836b8c8bfea4c6e&search=${name}`);
+    const videogames = await dataApi.data.results.map(videogame => ({
+        id: videogame.id,
+        name: videogame.name,
+        released: videogame.released,
+        image: videogame.background_image,
+        rating: videogame.rating,
+        platforms: videogame.platforms.map(platform => platform.platform.name),
+        genres: videogame.genres.map(genre => genre.name),
+    }));
+    const firstTwenty = await getFirstTwenty(videogames);
+    return firstTwenty
+}
+
 module.exports = {
     getVideogames,
     getAllData,
-    getFirstTwenty
+    getQueryDataApi,
+    getVideogamesById
 }

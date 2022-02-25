@@ -1,26 +1,42 @@
 const { Router } = require('express');
 const videogame = require('../models/Videogame');
-const { getAllData, getFirstTwenty } = require('../services/videogames');
+const { getAllData, getQueryDataApi, getVideogamesById } = require('../services/videogames');
 const router = Router();
+
 
 router.get('/', async(req,res) => {
     const { name } = req.query;
-    console.log(name)
     try {
-        const dataApi = await getAllData();
         if(name){
-            const filterByName = await dataApi.filter(videogame => videogame.name.toUpperCase().includes(name.toUpperCase()));
-            const firstTwenty = await getFirstTwenty(filterByName);
-            firstTwenty.length ? res.json(firstTwenty) : res.json({message: 'No existe un juego con dicho Id', error: 404 })
-            
+            const dataDb = await videogame.find({ name: name }); 
+            const dataApi = await getQueryDataApi(name);
+            const allVideogames = [...dataDb, ...dataApi];
+            allVideogames.length? res.json(allVideogames): res.json({message: 'No se encontro un juego con ese nombre', error: 404});
         }else{
-            res.json(dataApi);
+            const dataApi = await getAllData();
+            res.json(dataApi)
         }
     } catch (error) {
         console.log(error)
     }
 });
 
+router.get('/byId/:id', async(req,res) => {
+    const { id } = req.params;
+    let regex = /^[0-9]+$/;
+    const compare = id.match(regex)
+    try {
+        if(!compare){
+            const videogameDb = await videogame.findById(id);
+            console.log(videogameDb)
+            return res.json(videogameDb)
+        }
+        const dataApi = await getVideogamesById(id);
+        res.json(dataApi)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 router.post('/', async(req,res) => {
     const {name, released, rating, platforms, genres } = req.body;
@@ -30,18 +46,3 @@ router.post('/', async(req,res) => {
 })
 
 module.exports = router;
-
-
-/*   [ ] __GET /videogames?name="..."__:
-  - Obtener un listado de las primeros 15 videojuegos que contengan la palabra ingresada como query parameter
-  - Si no existe ningún videojuego mostrar un mensaje adecuado
-- [ ] __GET /videogame/{idVideogame}__:
-  - Obtener el detalle de un videojuego en particular
-  - Debe traer solo los datos pedidos en la ruta de detalle de videojuego
-  - Incluir los géneros asociados
-- [ ] __GET /genres__:
-  - Obtener todos los tipos de géneros de videojuegos posibles
-  - En una primera instancia deberán traerlos desde rawg y guardarlos en su propia base de datos y luego ya utilizarlos desde allí
-- [ ] __POST /videogame__:
-  - Recibe los datos recolectados desde el formulario controlado de la ruta de creación de videojuego por body
-  - Crea un videojuego en la base de datos */
