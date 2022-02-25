@@ -1,10 +1,11 @@
 const axios = require('axios')
 const videogame = require('../models/Videogame');
 const { API_KEY } = require('../config');
+const { URI_API_DATA_BY_ID, URI_API_DATA, URI_API_DATA_BY_NAME } = require('../constantes')
 
 
 const getVideogames = async() => {
-    const dataApi = await axios(`https://api.rawg.io/api/games${API_KEY}&page=2&page_size=5`);
+    const dataApi = await axios(`${URI_API_DATA}`);
     const dataApiMap = await dataApi.data.results.map(videogame => ({
         id: videogame.id,
         name: videogame.name,
@@ -37,7 +38,7 @@ const getFirstTwenty = async(array) => {
 }
 
 const getVideogamesById = async(id) => {
-    const videogame = await axios(`https://api.rawg.io/api/games/${id}?key=d0e09f787b57497bb836b8c8bfea4c6e`);
+    const videogame = await axios(`${URI_API_DATA_BY_ID}${id}${API_KEY}`);
     const videogameMap = await {
         id: videogame.data.id,
         name: videogame.data.name,
@@ -52,7 +53,7 @@ const getVideogamesById = async(id) => {
 }
 
 const getQueryDataApi = async(name) => {
-    const dataApi = await axios(`https://api.rawg.io/api/games?key=d0e09f787b57497bb836b8c8bfea4c6e&search=${name}`);
+    const dataApi = await axios(`${URI_API_DATA_BY_NAME}${name}`);
     const videogames = await dataApi.data.results.map(videogame => ({
         id: videogame.id,
         name: videogame.name,
@@ -67,7 +68,6 @@ const getQueryDataApi = async(name) => {
 }
 
 module.exports = {
-    getVideogames,
     getAllData,
     getQueryDataApi,
     getVideogamesById

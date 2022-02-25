@@ -1,10 +1,10 @@
 const axios = require('axios')
-const { API_KEY } = require('../config');
+const { URI_GENRES } = require('../constantes')
 
 
 const getGenres = async() => {
     try {
-        const dataApi = await axios(`https://api.rawg.io/api/genres${API_KEY}`);
+        const dataApi = await axios(`${URI_GENRES}`);
         const genresApi = await dataApi.data.results.map(genre => genre.name);
         return genresApi;
     } catch (error) {

@@ -39,10 +39,15 @@ router.get('/byId/:id', async(req,res) => {
 })
 
 router.post('/', async(req,res) => {
-    const {name, released, rating, platforms, genres } = req.body;
-    const createVideogame = videogame({name, released, rating, platforms, genres});
-    const newVideogame = await createVideogame.save();
-    res.json(newVideogame);
+    try{
+        const {name, released, rating, platforms, genres } = req.body;
+        const createVideogame = videogame({name, released, rating, platforms, genres});
+        const newVideogame = await createVideogame.save();
+        res.json(newVideogame);
+    }
+    catch(error){
+        console.log(error)
+    }
 })
 
 module.exports = router;
